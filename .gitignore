@@ -1,3 +1,12 @@
+# .NET build artifacts
+[Bb]in/
+[Oo]bj/
+
+# Unity-generated meta (irrelevant to the lib repo)
 *.meta
-obj/
-bin/
+
+# OS / IDE
+.vs/
+.idea/
+.vscode/
+.DS_Store
