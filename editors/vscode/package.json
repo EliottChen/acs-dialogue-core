@@ -1,0 +1,32 @@
+{
+  "name": "acsdlg",
+  "displayName": "ACSDlg (Achroma Dialogue)",
+  "description": "Syntax highlighting + snippets for the ACSDlg dialogue DSL (.acsdlg)",
+  "version": "0.1.0",
+  "publisher": "achroma",
+  "engines": { "vscode": "^1.75.0" },
+  "categories": ["Programming Languages"],
+  "contributes": {
+    "languages": [
+      {
+        "id": "acsdlg",
+        "aliases": ["ACSDlg", "acsdlg"],
+        "extensions": [".acsdlg"],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "acsdlg",
+        "scopeName": "source.acsdlg",
+        "path": "./syntaxes/acsdlg.tmLanguage.json"
+      }
+    ],
+    "snippets": [
+      {
+        "language": "acsdlg",
+        "path": "./snippets/acsdlg.json"
+      }
+    ]
+  }
+}

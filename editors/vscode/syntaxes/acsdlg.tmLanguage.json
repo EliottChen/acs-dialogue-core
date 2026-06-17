@@ -1,0 +1,75 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "ACSDlg",
+  "scopeName": "source.acsdlg",
+  "patterns": [
+    { "include": "#comment" },
+    { "include": "#directive" },
+    { "include": "#node" },
+    { "include": "#jump" },
+    { "include": "#keyword" },
+    { "include": "#string" },
+    { "include": "#speaker" },
+    { "include": "#markup" },
+    { "include": "#punctuation" }
+  ],
+  "repository": {
+    "comment": {
+      "match": "//.*$",
+      "name": "comment.line.double-slash.acsdlg"
+    },
+    "directive": {
+      "match": "(#start)\\s+([\\p{L}_][\\p{L}0-9_]*)",
+      "captures": {
+        "1": { "name": "keyword.control.directive.acsdlg" },
+        "2": { "name": "entity.name.section.acsdlg" }
+      }
+    },
+    "node": {
+      "match": "\\b(node)\\s+([\\p{L}_][\\p{L}0-9_]*)",
+      "captures": {
+        "1": { "name": "keyword.control.acsdlg" },
+        "2": { "name": "entity.name.function.acsdlg" }
+      }
+    },
+    "jump": {
+      "match": "\\b(jump)\\s+([\\p{L}_][\\p{L}0-9_]*)",
+      "captures": {
+        "1": { "name": "keyword.control.acsdlg" },
+        "2": { "name": "entity.name.function.acsdlg" }
+      }
+    },
+    "keyword": {
+      "match": "\\b(choice|end)\\b",
+      "name": "keyword.control.acsdlg"
+    },
+    "string": {
+      "begin": "\"",
+      "end": "\"",
+      "name": "string.quoted.double.acsdlg"
+    },
+    "speaker": {
+      "match": "^(\\s*)([\\p{L}_][\\p{L}0-9_ ]*?)(\\s*:)",
+      "captures": {
+        "2": { "name": "entity.name.class.acsdlg" },
+        "3": { "name": "punctuation.separator.acsdlg" }
+      }
+    },
+    "markup": {
+      "begin": "\\[",
+      "end": "\\]",
+      "name": "meta.tag.markup.acsdlg",
+      "patterns": [
+        { "match": "\\b(speed|s|pause|p|tp|emit)\\b", "name": "support.type.acsdlg" },
+        { "match": "[-+]?[0-9]*\\.?[0-9]+", "name": "constant.numeric.acsdlg" }
+      ]
+    },
+    "punctuation": {
+      "patterns": [
+        { "match": "[{}]", "name": "punctuation.section.block.acsdlg" },
+        { "match": ";", "name": "punctuation.terminator.acsdlg" },
+        { "match": ":", "name": "punctuation.separator.acsdlg" }
+      ]
+    }
+  }
+}

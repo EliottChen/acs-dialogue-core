@@ -1,0 +1,27 @@
+{
+  "Start directive": {
+    "prefix": "start",
+    "body": ["#start ${1:NodeId}"],
+    "description": "Dialogue entry point"
+  },
+  "Node": {
+    "prefix": "node",
+    "body": ["node ${1:Id} {", "\t$0", "}"],
+    "description": "Dialogue node"
+  },
+  "Line": {
+    "prefix": "line",
+    "body": ["${1:Speaker} : ${2:text};"],
+    "description": "Spoken line (empty speaker = narration)"
+  },
+  "Choice (jump)": {
+    "prefix": "choicejump",
+    "body": ["choice \"${1:Label}\" jump ${2:Target};"],
+    "description": "Choice that jumps to a node"
+  },
+  "Choice (block)": {
+    "prefix": "choiceblock",
+    "body": ["choice \"${1:Label}\" {", "\t$0", "}"],
+    "description": "Choice with an inline block"
+  }
+}
