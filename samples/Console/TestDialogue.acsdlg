@@ -1,0 +1,74 @@
+#start Debut
+
+node Debut {
+    : Bonjour, ceci est une première ébauche du système de dialogue d'Achroma Station;
+    : Ceci est le début d'un long système;
+    Eliott : Bonjour, je suis le développeur derrière le système de dialogue d'Achroma Station;
+    Eliott : Ceci est le début d'un long système;
+    Narrateur : Pour que ça reste simple : il a fallu mettre un `:` au début de chaque ligne;
+    jump PourquoiSeparateur;
+}
+
+node PourquoiSeparateur {
+    	Eliott : Le deux-points initial [p:0.5] délimite qui parle;
+	Eliott: Ce que ça veut dire ?[p:1.5] C'est que je peux mettre autant de ::::::: que je veux :! après mon texte;
+	Eliott: Et ce choix ne casse pas le language de programmation de dialogue que j'ai créer!;
+: Comme vous l'aurez compris, ce système ce veut[tp] simple;
+
+jump LesBalises;
+}
+
+node LesBalises{
+Eliott: Les balises permettent[speed:0.3] de ralentir la vitesse de lecture[speed:1.0] ou de l'accélérer !;
+Eliott: Si je veux je peux aussi [tp]rendre l'affichage du dialogue instantanée !;
+Eliott:Une chose à savoir c'est que les balises permettent aussi d'envoyer des évènements ![emit:event];
+Eliott: Les évènements sont envoyés sous formes de messages strings, mais là je ne parle qu'au développeurs;
+Eliott : [emit:Shake][speed: 0.3]Cependant[pause: 1.0];
+jump FaireChoix;
+}
+
+node FaireChoix{
+Eliott: Maintenant les choix !;
+choice "Je choisis A" jump FakeA;
+choice "Je choisis B" jump FaireChoix_B;
+}
+
+node FakeA{
+	jump FaireChoix_A;
+}
+
+node FakeB{
+	jump FakeA;
+}
+
+node FaireChoix_A
+{
+	Eliott: A est raisonnable;
+	choice "Je ne sais pas quoi dire"
+	{ 
+		Eliott: Tu n'as pas besoin de savoir quoi dire;
+	}
+	choice "C'était très clair, Merci" 
+	{
+		Eliott: ça m'as fait plaisir d'imaginer le système;
+		Eliott: Il faut faire attention à pleins de petites choses !;
+		choice "Imagine mettre des choices dans des choices" 
+		{
+			Eliott: Tu veux faire exploser mon système;
+		}
+		choice "Ne rien dire." jump conclusion;
+	} 
+
+	jump conclusion;
+}
+
+node FaireChoix_B{
+Eliott: La contrainte est qu'on ne peut pas revenir en mode hub mais ce n'est pas grave !;
+Eliott: Car avec mon système maintenant c'est supposé pouvoir être implémenté !;
+jump conclusion;
+}
+
+node conclusion{
+Eliott: merci d'être resté jusque là !;
+end;
+}

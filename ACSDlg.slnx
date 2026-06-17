@@ -1,0 +1,7 @@
+<Solution>
+  <Folder Name="/samples/" />
+  <Folder Name="/samples/Console/">
+    <Project Path="samples/Console/ACSDlg.Console.Sample.csproj" />
+  </Folder>
+  <Project Path="ACSDlg.Core.csproj" />
+</Solution>

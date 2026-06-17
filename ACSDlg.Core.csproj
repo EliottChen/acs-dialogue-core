@@ -5,4 +5,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <!-- La lib ne compile que son propre code, jamais les samples. -->
+  <ItemGroup>
+    <Compile Remove="samples/**/*.cs" />
+  </ItemGroup>
+
 </Project>
