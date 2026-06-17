@@ -1,0 +1,5 @@
+*.meta
+obj/
+bin/
+*.csproj
+*.sln

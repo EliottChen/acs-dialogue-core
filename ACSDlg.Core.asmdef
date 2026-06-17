@@ -1,0 +1,15 @@
+{
+  "name": "ACSDlg.Core",
+  "rootNamespace": "ACSDlg.Core",
+  "references": [
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": true
+}
