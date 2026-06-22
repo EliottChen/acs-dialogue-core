@@ -10,6 +10,12 @@ namespace MyApp
         // File I/O lives here, in the host — the core only ever sees the source string.
         static void Main(string[] args)
         {
+            if (args.Length > 0 && args[0] == "--selftest")
+            {
+                LocaleSelfTest.Run();
+                return;
+            }
+
             // Drag a .acsdlg onto the .exe → its path arrives in args. Double-clicked → ask for one.
             string lPath = args.Length > 0 ? args[0] : Prompt();
 

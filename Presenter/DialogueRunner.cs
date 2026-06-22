@@ -27,15 +27,21 @@ namespace ACSDlg.Core
         public State CurrentState { get; private set; } = State.NotStarted;
 
         private readonly IRunnerController _controller;
+        private readonly DialogueLocalizer? _localizer;
         private readonly Stack<ReadFrame> _frames = new Stack<ReadFrame>();
         private DialogueGraph? _graph;
         private ChoiceContent? _pendingChoice;
         // Id of the node owning the current stack — kept for error messages only.
         private string _currentNodeId = "";
 
-        public DialogueRunner(IRunnerController pController)
+        /// <param name="pLocalizer">
+        /// Optional. When null the dialogue plays in its source language (zero overhead).
+        /// When set, every line and choice label is resolved against the active locale.
+        /// </param>
+        public DialogueRunner(IRunnerController pController, DialogueLocalizer? pLocalizer = null)
         {
             _controller = pController ?? throw new ArgumentNullException(nameof(pController));
+            _localizer = pLocalizer;
         }
 
         // --- Commands called BY the View ---
@@ -145,7 +151,7 @@ namespace ACSDlg.Core
                 switch (lFrame.Contents[lFrame.Index])
                 {
                     case LineContent lLine:
-                        _controller.ShowLine(lLine.Speaker, lLine.Line);
+                        _controller.ShowLine(lLine.Speaker, _localizer?.ResolveLine(lLine) ?? lLine.Line);
                         return;
 
                     case ChoiceContent lChoice:
@@ -186,11 +192,14 @@ namespace ACSDlg.Core
             _controller.DialogueEnd();
         }
 
-        private static IReadOnlyList<string> GetOptionLabels(ChoiceContent pChoice)
+        private IReadOnlyList<string> GetOptionLabels(ChoiceContent pChoice)
         {
             string[] lLabels = new string[pChoice.Options.Count];
             for (int i = 0; i < lLabels.Length; i++)
-                lLabels[i] = pChoice.Options[i].Text;
+            {
+                string lLabel = pChoice.Options[i].Text;
+                lLabels[i] = _localizer?.ResolveLabel(lLabel) ?? lLabel;
+            }
             return lLabels;
         }
 

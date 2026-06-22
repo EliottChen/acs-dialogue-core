@@ -189,17 +189,18 @@ namespace ACSDlg.Core
             Expect(TokenType.Semicolon, "';' after line text");
 
             string lSpeakerName = lSpeaker.ToString().Trim();
+            string lRawText = lText.Value.Trim();
             ParsedLine lLine;
             try
             {
-                lLine = MarkupParser.Parse(lText.Value.Trim());
+                lLine = MarkupParser.Parse(lRawText);
             }
             catch (FormatException lEx)
             {
                 throw Error(lEx.Message.TrimEnd('.'), lText);
             }
 
-            return new LineContent(lSpeakerName.Length == 0 ? null : lSpeakerName, lLine);
+            return new LineContent(lSpeakerName.Length == 0 ? null : lSpeakerName, lLine, lRawText);
         }
 
         // --- Validation ---
