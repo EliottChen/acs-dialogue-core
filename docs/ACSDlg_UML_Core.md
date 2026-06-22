@@ -1,21 +1,33 @@
-# ACSDlg — UML du Core C#
+# ACSDlg — C# Core UML
 
-*Diagramme de classes du core (`Core/src/`), état : architecture v0.2 + choix inline.*
-*Se rend sur GitHub et dans VS Code (aperçu Markdown). Mettre à jour en même temps que le code.*
+*Class diagram of the core, state: architecture v0.3 (inline choices + localization).*
+*Renders on GitHub and in VS Code (Markdown preview). Update it together with the code.*
 
-## Vue d'ensemble (pipeline)
+## Overview (pipeline)
 
 ```mermaid
 flowchart LR
-    SRC[".acsdlg<br/>(string, lue par le host)"] --> LEX[Lexer]
+    SRC[".acsdlg<br/>(string, read by the host)"] --> LEX[Lexer]
     LEX -- "List&lt;Token&gt;" --> PAR[Parser]
     PAR -- "DialogueGraph (AST)" --> RUN[DialogueRunner]
     RUN -- "IRunnerController" --> VIEW["View (Console / Unity / Godot)"]
     VIEW -- "Start / Update(dt) / Skip" --> ANIM[TypewriterAnimator]
     VIEW -- "Advance / SelectChoice / Stop" --> RUN
+    RUN -. "ResolveLine / ResolveLabel" .-> LOC[DialogueLocalizer]
+    LOC -- "GetLocale()" --> LP["ILocaleProvider (host)"]
 ```
 
-## Diagramme de classes
+## Localization pipeline (offline, host-driven)
+
+```mermaid
+flowchart LR
+    AST["DialogueGraph"] --> EXP["Xliff.Export"]
+    EXP -- "&lt;name&gt;.&lt;lang&gt;.xlf<br/>(empty targets)" --> TR["translator / agency"]
+    TR -- "filled .xlf" --> IMP["Xliff.Import"]
+    IMP -- "source → translation" --> SC["DialogueLocalizer.SetCatalog"]
+```
+
+## Class diagram
 
 ```mermaid
 classDiagram
@@ -40,6 +52,7 @@ classDiagram
     class LineContent {
         +string? Speaker
         +ParsedLine Line
+        +string SourceText
     }
 
     class ChoiceContent {
@@ -118,16 +131,19 @@ classDiagram
     %% ===================== PRESENTER =====================
     class DialogueRunner {
         +State CurrentState
+        -IRunnerController _controller
+        -DialogueLocalizer? _localizer
         -Stack~ReadFrame~ _frames
         -DialogueGraph? _graph
         -ChoiceContent? _pendingChoice
-        +DialogueRunner(pController)
+        +DialogueRunner(pController, pLocalizer)
         +StartDialogue(pGraph)
         +Advance()
         +SelectChoice(pIndex)
         +Stop()
         -EnterNode(pNodeId)
         -ReadCurrentContent()
+        -GetOptionLabels(pChoice)
     }
 
     class ReadFrame {
@@ -138,11 +154,36 @@ classDiagram
 
     class IRunnerController {
         <<interface>>
-        +OnDialogueStart()
+        +DialogueStart()
         +ShowLine(pSpeaker, pLine)
         +ShowChoices(pOptions)
         +Emit(pSignal)
-        +OnDialogueEnded()
+        +DialogueEnd()
+    }
+
+    %% ===================== LOCALIZATION =====================
+    class ILocaleProvider {
+        <<interface>>
+        +GetLocale() string
+    }
+
+    class DialogueLocalizer {
+        -ILocaleProvider _locale
+        -Dictionary~string,IReadOnlyDictionary~ _catalogs
+        +DialogueLocalizer(pLocale)
+        +SetCatalog(pLocale, pTable)
+        +ResolveLine(pLine) ParsedLine
+        +ResolveLabel(pLabel) string
+        -TryTranslate(pSource, out pTranslated) bool
+    }
+
+    class Xliff {
+        <<static>>
+        +Export(pGraph, pSourceLang, pTargetLang, pOriginal, pTranslations)$ string
+        +Import(pXliff)$ Dictionary~string,string~
+        -SourceStrings(pGraph)$
+        -Collect(pContents, pOut, pSeen)$
+        -Hash(pText)$ string
     }
 
     %% ===================== ANIMATION =====================
@@ -164,15 +205,16 @@ classDiagram
         +IReadOnlyList~string~ Emits
     }
 
-    %% ===================== VIEW (hors core, exemple) =====================
+    %% ===================== VIEW / HOST (out of core, example) =====================
     class ConsoleDialoguePresenter {
-        <<adapter — hors core>>
+        <<adapter — out of core>>
         -DialogueRunner _runner
         -TypewriterAnimator _animator
+        +ConsoleDialoguePresenter(pLocalizer)
         +StartDialogue(pGraph)
     }
 
-    %% ----- Relations Model -----
+    %% ----- Model relations -----
     DialogueGraph "1" *-- "many" DialogueNode : Nodes
     DialogueNode "1" o-- "many" IDialogueContent : Contents
     IDialogueContent <|.. LineContent
@@ -180,52 +222,65 @@ classDiagram
     IDialogueContent <|.. JumpContent
     IDialogueContent <|.. EndContent
     ChoiceContent "1" *-- "1..*" ChoiceOption : Options
-    ChoiceOption "0..1" o-- "many" IDialogueContent : InlineContent (récursif)
+    ChoiceOption "0..1" o-- "many" IDialogueContent : InlineContent (recursive)
     LineContent "1" *-- "1" ParsedLine
     ParsedLine "1" *-- "many" MarkupTag
     MarkupTag ..> MarkupKind
 
-    %% ----- Relations Front-end -----
-    Lexer ..> Token : produit
-    Parser ..> Token : consomme
-    Parser ..> MarkupParser : délègue le markup
-    Parser ..> DialogueGraph : construit
-    MarkupParser ..> ParsedLine : produit
+    %% ----- Front-end relations -----
+    Lexer ..> Token : produces
+    Parser ..> Token : consumes
+    Parser ..> MarkupParser : delegates markup
+    Parser ..> DialogueGraph : builds
 
-    %% ----- Relations Presenter / Animation -----
-    DialogueRunner --> IRunnerController : pilote (injecté au ctor)
-    DialogueRunner ..> DialogueGraph : lit
-    DialogueRunner "1" *-- "many" ReadFrame : pile de lecture
-    ReadFrame o-- IDialogueContent : pointe dans l'AST
-    TypewriterAnimator ..> ParsedLine : consomme
-    TypewriterAnimator ..> TypewriterTick : produit
+    MarkupParser ..> ParsedLine : produces
 
-    %% ----- Frontière moteur -----
+    %% ----- Presenter / Animation relations -----
+    DialogueRunner --> IRunnerController : drives (injected in ctor)
+    DialogueRunner ..> DialogueLocalizer : resolves (optional, injected)
+    DialogueRunner ..> DialogueGraph : reads
+    DialogueRunner "1" *-- "many" ReadFrame : read stack
+    ReadFrame o-- IDialogueContent : points into the AST
+    TypewriterAnimator ..> ParsedLine : consumes
+    TypewriterAnimator ..> TypewriterTick : produces
+
+    %% ----- Localization relations -----
+    DialogueLocalizer --> ILocaleProvider : asks the locale
+    DialogueLocalizer ..> LineContent : reads SourceText
+    DialogueLocalizer ..> MarkupParser : re-parses the translation
+    Xliff ..> DialogueGraph : reads
+    Xliff ..> LineContent : SourceText
+    Xliff ..> ChoiceOption : Text
+
+    %% ----- Engine boundary -----
     IRunnerController <|.. ConsoleDialoguePresenter
-    ConsoleDialoguePresenter *-- TypewriterAnimator : possède l'instance
-    ConsoleDialoguePresenter --> DialogueRunner : commandes (Advance/SelectChoice)
+    ConsoleDialoguePresenter *-- TypewriterAnimator : owns the instance
+    ConsoleDialoguePresenter --> DialogueRunner : commands (Advance/SelectChoice)
 ```
 
-## Légende des relations
+## Relation legend
 
-| Flèche | Sens |
+| Arrow | Meaning |
 |---|---|
-| `*--` (composition, losange plein) | possède et gère le cycle de vie (le graphe possède ses nodes) |
-| `o--` (agrégation, losange vide) | référence sans posséder (une ReadFrame pointe dans l'AST, ne le possède pas) |
-| `<|..` (réalisation, pointillés) | implémente l'interface |
-| `..>` (dépendance, pointillés) | utilise / produit / consomme, sans détenir |
-| `-->` (association) | tient une référence durable |
+| `*--` (composition, filled diamond) | owns and manages the lifecycle (the graph owns its nodes) |
+| `o--` (aggregation, empty diamond) | references without owning (a ReadFrame points into the AST, does not own it) |
+| `<|..` (realization, dashed) | implements the interface |
+| `..>` (dependency, dashed) | uses / produces / consumes, without holding |
+| `-->` (association) | holds a durable reference |
 
-## Les trois lignes de force à retenir
+## The four lines of force to remember
 
-1. **Le sens unique du pipeline** : `string → Lexer → Parser → DialogueGraph → DialogueRunner → IRunnerController`. Rien ne remonte ; la View répond uniquement par les commandes publiques du runner (`Advance`, `SelectChoice`, `Stop`).
-2. **La frontière moteur passe par deux points seulement** : l'interface `IRunnerController` (le runner pilote la View sans la connaître) et le `TypewriterAnimator` (classe core, mais *instance* possédée et pulsée par chaque View avec son propre deltaTime). Tout le reste du core est invisible au moteur.
-3. **La récursion du Model fait la récursion du runtime** : `ChoiceOption.InlineContent` boucle vers `IDialogueContent` (un bloc peut contenir des choix) ; côté runner, cette récursion se parcourt avec la pile de `ReadFrame` (push à l'entrée d'un bloc, pop = retombée à la Ink, clear sur jump).
+1. **The one-way pipeline**: `string → Lexer → Parser → DialogueGraph → DialogueRunner → IRunnerController`. Nothing flows back up; the View answers only through the runner's public commands (`Advance`, `SelectChoice`, `Stop`).
+2. **The engine boundary passes through three points only**: the interface `IRunnerController` (the runner drives the View without knowing it), the `ILocaleProvider` interface (the core learns the active locale without knowing the engine), and the `TypewriterAnimator` (core class, but its *instance* is owned and pulsed by each View with its own deltaTime). Everything else in the core is invisible to the engine.
+3. **The Model recursion drives the runtime recursion**: `ChoiceOption.InlineContent` loops back to `IDialogueContent` (a block can contain choices); runner-side, that recursion is walked with the `ReadFrame` stack (push on entering a block, pop = Ink-style fall-through, clear on jump).
+4. **Localization is optional and source-keyed**: the runner resolves through a `DialogueLocalizer` only when one is injected (`null` = source language, zero overhead). The lookup key is the raw `SourceText`; a translated line is re-parsed once by `MarkupParser`; the XLIFF `id` is an opaque tool handle, never the key.
 
-## Rappels d'invariants (détail dans ACSDlg_Architecture_v0.2.md)
+## Invariant reminders (details in ACSDlg_Architecture_v0.3.md)
 
-- Le core ne référence aucun moteur, aucun fichier, aucune horloge.
-- Les types de contenu sont des données pures ; le comportement vit dans le runner (flux) et la View (rendu).
-- `ChoiceOption` : exactement un de `TargetId` / `InlineContent` est renseigné (garanti par les deux constructeurs + le parser).
-- Le markup est parsé une fois, à la construction de l'AST.
-- Validation au parsing : cibles de jump/choice (récursif dans les blocs), `#start`, doublons de nodes, balises inconnues — `FormatException` avec ligne/colonne.
+- The core references no engine, no file, no clock. The netstandard BCL (incl. `System.Xml.Linq`, used by `Xliff`) is allowed.
+- Content types are pure data; behaviour lives in the runner (flow) and the View (rendering).
+- `ChoiceOption`: exactly one of `TargetId` / `InlineContent` is set (guaranteed by the two constructors + the parser).
+- Markup is parsed once at AST construction for the source language; a translated line is re-parsed once on resolution.
+- Parse-time validation: jump/choice targets (recursive inside blocks), `#start`, duplicate nodes, unknown tags — `FormatException` with line/column.
+- Translation identity is the source text (gettext model); empty XLIFF targets fall back to the source line at runtime.
+```
