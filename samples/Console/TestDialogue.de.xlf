@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+  <file original="TestDialogue.acsdlg" source-language="fr" target-language="de" datatype="plaintext">
+    <body>
+      <trans-unit id="89a85373ba3192ac">
+        <source>Bonjour, ceci est une première ébauche du système de dialogue d'Achroma Station</source>
+        <target>Hallo, dies ist ein erster Entwurf des Achroma-Station-Dialogsystems</target>
+      </trans-unit>
+      <trans-unit id="ebfc3ece0807ddf9">
+        <source>Ceci est le début d'un long système</source>
+        <target></target>
+      </trans-unit>
+      <trans-unit id="e523e04703414987">
+        <source>Bonjour, je suis le développeur derrière le système de dialogue d'Achroma Station</source>
+        <target></target>
+      </trans-unit>
+      <trans-unit id="7df2836e1a5559dc">
+        <source>Pour que ça reste simple : il a fallu mettre un `:` au début de chaque ligne</source>
+        <target></target>
+      </trans-unit>
+      <trans-unit id="9517e9c9db3dd025">
+        <source>Le deux-points initial [p:0.5] délimite qui parle</source>
+        <target></target>
+      </trans-unit>
+      <trans-unit id="db371ba90e1058f7">
+        <source>Ce que ça veut dire ?[p:1.5] C'est que je peux mettre autant de ::::::: que je veux :! après mon texte</source>
+        <target></target>
+      </trans-unit>
+      <trans-unit id="2138c67817c1dcfc">
+        <source>Et ce choix ne casse pas le language de programmation de dialogue que j'ai créer!</source>
+        <target></target>
+      </trans-unit>
+      <trans-unit id="01f1a12b66b033a3">
+        <source>Comme vous l'aurez compris, ce système ce veut[tp] simple</source>
+        <target></target>
+      </trans-unit>
+      <trans-unit id="5b4bb0d5b4921fbe">
+        <source>Les balises permettent[speed:0.3] de ralentir la vitesse de lecture[speed:1.0] ou de l'accélérer !</source>
+        <target></target>
+      </trans-unit>
+      <trans-unit id="e96819612e80bee9">
+        <source>Si je veux je peux aussi [tp]rendre l'affichage du dialogue instantanée !</source>
+        <target></target>
+      </trans-unit>
+      <trans-unit id="2240cd32699e4830">
+        <source>Une chose à savoir c'est que les balises permettent aussi d'envoyer des évènements ![emit:event]</source>
+        <target></target>
+      </trans-unit>
+      <trans-unit id="379d3006000a92f5">
+        <source>Les évènements sont envoyés sous formes de messages strings, mais là je ne parle qu'au développeurs</source>
+        <target></target>
+      </trans-unit>
+      <trans-unit id="edace38f35e17e31">
+        <source>[emit:Shake][speed: 0.3]Cependant[pause: 1.0]</source>
+        <target></target>
+      </trans-unit>
+      <trans-unit id="9ee37a4c04b9c982">
+        <source>Maintenant les choix !</source>
+        <target></target>
+      </trans-unit>
+      <trans-unit id="b168a4eee47fe67f">
+        <source>Je choisis A</source>
+        <target></target>
+      </trans-unit>
+      <trans-unit id="b168a5eee47fe832">
+        <source>Je choisis B</source>
+        <target></target>
+      </trans-unit>
+      <trans-unit id="73a553c99b465b22">
+        <source>A est raisonnable</source>
+        <target></target>
+      </trans-unit>
+      <trans-unit id="cc9a3128cf326b8b">
+        <source>Je ne sais pas quoi dire</source>
+        <target></target>
+      </trans-unit>
+      <trans-unit id="580026286224adbe">
+        <source>Tu n'as pas besoin de savoir quoi dire</source>
+        <target></target>
+      </trans-unit>
+      <trans-unit id="13526dbfde8317d6">
+        <source>C'était très clair, Merci</source>
+        <target></target>
+      </trans-unit>
+      <trans-unit id="5f2875dcc77cba8c">
+        <source>ça m'as fait plaisir d'imaginer le système</source>
+        <target></target>
+      </trans-unit>
+      <trans-unit id="c7d79d85abe28007">
+        <source>Il faut faire attention à pleins de petites choses !</source>
+        <target></target>
+      </trans-unit>
+      <trans-unit id="519fa7954d6f99ca">
+        <source>Imagine mettre des choices dans des choices</source>
+        <target></target>
+      </trans-unit>
+      <trans-unit id="a713ccdc3181a1a0">
+        <source>Tu veux faire exploser mon système</source>
+        <target></target>
+      </trans-unit>
+      <trans-unit id="bfd89e5b568e43ce">
+        <source>Ne rien dire.</source>
+        <target></target>
+      </trans-unit>
+      <trans-unit id="a7cbd8fc0ca863c1">
+        <source>La contrainte est qu'on ne peut pas revenir en mode hub mais ce n'est pas grave !</source>
+        <target></target>
+      </trans-unit>
+      <trans-unit id="25cd219e3a6bfad7">
+        <source>Car avec mon système maintenant c'est supposé pouvoir être implémenté !</source>
+        <target></target>
+      </trans-unit>
+      <trans-unit id="49ad38c9935e66a0">
+        <source>merci d'être resté jusque là !</source>
+        <target></target>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

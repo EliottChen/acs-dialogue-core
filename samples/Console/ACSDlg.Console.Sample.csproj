@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <None Include="TestDialogue.acsdlg" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="TestDialogue.en.xlf" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>

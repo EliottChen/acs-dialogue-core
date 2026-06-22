@@ -9,10 +9,14 @@ namespace ACSDlg.Core
         /// <summary>Clean display text plus pre-parsed inline markup.</summary>
         public ParsedLine Line;
 
-        public LineContent(string? pSpeaker, ParsedLine pLine)
+        /// <summary>Raw line text WITH its [...] markup, as authored. Identity used for translation lookup.</summary>
+        public string SourceText;
+
+        public LineContent(string? pSpeaker, ParsedLine pLine, string pSourceText)
         {
             Speaker = pSpeaker;
             Line = pLine;
+            SourceText = pSourceText;
         }
     }
 }
