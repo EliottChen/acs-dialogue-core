@@ -33,8 +33,8 @@ namespace ACSDlg.Core
 
                 lBody.Add(new XElement(Ns + "trans-unit",
                     new XAttribute("id", Hash(lSource)),
-                    new XElement(Ns + "source", lSource),
-                    new XElement(Ns + "target", lTarget)));
+                    Inline(Ns + "source", lSource),
+                    Inline(Ns + "target", lTarget)));
             }
 
             XDocument lDoc = new XDocument(
@@ -71,6 +71,66 @@ namespace ACSDlg.Core
             return lCatalog;
         }
 
+        /// <summary>
+        /// Check an imported catalog for markup damage: every translation must carry the SAME set of
+        /// [tags] as its source (order/position free), so a translator can't silently drop an
+        /// [emit]/[pause] or break a tag. Returns one human-readable problem per offending entry;
+        /// empty list = clean. Meant to be surfaced at import time (e.g. Unity LogImportWarning).
+        /// </summary>
+        public static List<string> Validate(IReadOnlyDictionary<string, string> pCatalog)
+        {
+            List<string> lProblems = new List<string>();
+
+            foreach (KeyValuePair<string, string> lPair in pCatalog)
+            {
+                if (string.IsNullOrEmpty(lPair.Value)) continue;        // untranslated → nothing to check
+
+                List<string> lSourceTags;
+                try { lSourceTags = TagSignatures(lPair.Key); }
+                catch (FormatException) { continue; }                  // broken source is a parse-time bug, not the translator's
+
+                List<string> lTargetTags;
+                try { lTargetTags = TagSignatures(lPair.Value); }
+                catch (FormatException lEx)
+                {
+                    lProblems.Add($"\"{Snippet(lPair.Key)}\" → broken markup in translation: {lEx.Message}");
+                    continue;
+                }
+
+                if (!SameTags(lSourceTags, lTargetTags))
+                    lProblems.Add($"\"{Snippet(lPair.Key)}\" → tag mismatch: source [{string.Join(" ", lSourceTags)}] vs translation [{string.Join(" ", lTargetTags)}]");
+            }
+
+            return lProblems;
+        }
+
+        // Sorted tag signatures of a raw line (kind + value, position ignored) → comparable as a multiset.
+        private static List<string> TagSignatures(string pRaw)
+        {
+            List<string> lSignatures = new List<string>();
+            foreach (MarkupTag lTag in MarkupParser.Parse(pRaw).Tags)
+            {
+                switch (lTag.Kind)
+                {
+                    case MarkupKind.Emit:     lSignatures.Add($"emit:{lTag.StringValue}"); break;
+                    case MarkupKind.Teleport: lSignatures.Add("tp"); break;
+                    default:                  lSignatures.Add($"{lTag.Kind}:{lTag.NumericValue}"); break;
+                }
+            }
+            lSignatures.Sort();
+            return lSignatures;
+        }
+
+        private static bool SameTags(List<string> pA, List<string> pB)
+        {
+            if (pA.Count != pB.Count) return false;
+            for (int i = 0; i < pA.Count; i++)
+                if (pA[i] != pB[i]) return false;   // both sorted
+            return true;
+        }
+
+        private static string Snippet(string pText) => pText.Length <= 50 ? pText : pText.Substring(0, 50) + "…";
+
         // Every translatable string in document order, deduplicated (identical lines share one unit).
         private static IEnumerable<string> SourceStrings(DialogueGraph pGraph)
         {
@@ -100,6 +160,34 @@ namespace ACSDlg.Core
                         break;
                 }
             }
+        }
+
+        // Build a <source>/<target> element, wrapping each [...] markup run in a <ph> inline placeholder
+        // so CAT tools (OmegaT, Trados…) lock it: the translator can move the tag but not edit/break it.
+        // Round-trips transparently: element.Value concatenates the <ph> text, rebuilding the raw string.
+        private static XElement Inline(XName pName, string pRaw)
+        {
+            XElement lElement = new XElement(pName);
+            int lPhId = 1;
+            int lPos = 0;
+
+            while (lPos < pRaw.Length)
+            {
+                int lOpen = pRaw.IndexOf('[', lPos);
+                if (lOpen < 0) { lElement.Add(new XText(pRaw.Substring(lPos))); break; }
+
+                int lClose = pRaw.IndexOf(']', lOpen);
+                if (lClose < 0) { lElement.Add(new XText(pRaw.Substring(lPos))); break; } // unclosed → literal
+
+                if (lOpen > lPos)
+                    lElement.Add(new XText(pRaw.Substring(lPos, lOpen - lPos)));
+
+                string lTag = pRaw.Substring(lOpen, lClose - lOpen + 1);                  // "[emit:Shake]"
+                lElement.Add(new XElement(Ns + "ph", new XAttribute("id", lPhId++), lTag));
+                lPos = lClose + 1;
+            }
+
+            return lElement;
         }
 
         // FNV-1a 64-bit: deterministic across processes (unlike string.GetHashCode), good enough as

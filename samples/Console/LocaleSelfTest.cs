@@ -52,6 +52,15 @@ namespace ACSDlg.ConsoleApp
             LineContent lUnknown = new LineContent(null, MarkupParser.Parse("Inédit"), "Inédit");
             Check(lLoc.ResolveLine(lUnknown).CleanText == "Inédit", "missing-key fallback");
 
+            // Validation des tags : un [emit] supprimé ou un markup cassé est signalé, l'OK ne l'est pas.
+            List<string> lProblems = Xliff.Validate(new Dictionary<string, string>
+            {
+                ["Go[emit:Door] now"]  = "Va maintenant",          // [emit:Door] supprimé
+                ["Wait[pause:1] here"] = "Attends[pause:1] ici",   // OK
+                ["Hit[emit:Shake]"]    = "Frappe[emit:Shake",      // markup cassé
+            });
+            Check(lProblems.Count == 2, "validate flags dropped + broken, spares the OK one");
+
             Console.WriteLine("LocaleSelfTest: OK");
         }
 

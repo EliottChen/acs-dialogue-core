@@ -39,6 +39,10 @@ namespace ACSDlg.Core
             _catalogs[pLocale] = pTable ?? throw new ArgumentNullException(nameof(pTable));
         }
 
+        /// <summary>Drop every loaded catalog. Call before loading a self-contained set (e.g. one
+        /// dialogue's) so a previous dialogue's catalog can't leak a translation into this one.</summary>
+        public void ClearCatalogs() => _catalogs.Clear();
+
         /// <summary>Translated, re-parsed line for the active locale, or the source line on any miss.</summary>
         public ParsedLine ResolveLine(LineContent pLine)
         {

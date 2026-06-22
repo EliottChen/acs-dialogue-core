@@ -62,6 +62,66 @@ Useful rules:
 
 The current language is kept between two reads (shown in the `[xx] >` prompt).
 
+## Connecting the language to a game engine (Unity)
+
+The core is engine-agnostic, so wiring localization into Unity is three steps. Build the core
+(`dotnet build -c Release`) and drop `ACSDlg.Core.dll` into `Assets/Plugins/`, then:
+
+**1. Tell the core which language is active** — implement `ILocaleProvider` (a plain class,
+no `MonoBehaviour` needed):
+
+```csharp
+using ACSDlg.Core;
+using UnityEngine.Localization.Settings;
+
+public sealed class UnityLocaleProvider : ILocaleProvider
+{
+    // Whatever the Unity Localization package has selected: "en", "fr", "de", "zh-Hans"…
+    public string GetLocale() => LocalizationSettings.SelectedLocale.Identifier.Code;
+}
+```
+
+**2. Load the catalogs and inject the localizer** — ship each `.xlf` as a `TextAsset`
+(rename it `.xlf.txt`/`.bytes`, or add a tiny `ScriptedImporter`), then:
+
+```csharp
+using ACSDlg.Core;
+using UnityEngine;
+
+public class DialogueBootstrap : MonoBehaviour
+{
+    [System.Serializable] public struct Catalog { public string Locale; public TextAsset Xlf; }
+    [SerializeField] Catalog[] _catalogs;   // e.g. { "en", TestDialogue.en.xlf }, { "de", … }
+
+    DialogueLocalizer _localizer;
+
+    void Awake()
+    {
+        _localizer = new DialogueLocalizer(new UnityLocaleProvider());
+        foreach (Catalog lCat in _catalogs)
+            _localizer.SetCatalog(lCat.Locale, Xliff.Import(lCat.Xlf.text));   // host reads the file, core sees strings
+    }
+
+    // Pass the localizer to the runner when you start a dialogue (your View implements IRunnerController):
+    public void Play(DialogueGraph pGraph, IRunnerController pView)
+        => new DialogueRunner(pView, _localizer).StartDialogue(pGraph);
+}
+```
+
+**3. That's it for language switching.** `DialogueLocalizer` reads the locale from
+`ILocaleProvider` on **every line**, so when the player changes language (Unity's
+`LocalizationSettings.SelectedLocaleChanged`), the next line is already in the new language —
+as long as that locale's catalog was loaded in step 2. Nothing to rebuild at runtime.
+
+Notes:
+
+- The locale **code must match** between `GetLocale()` and the `SetCatalog` key (`zh-Hans`, not `cn`).
+- The `.xlf` **filename is irrelevant** inside Unity — you map code → `TextAsset` yourself; the
+  `<name>.<lang>.xlf` convention only matters for the console host and the export step.
+- The Unity Localization package handles UI strings, fonts, and locale selection; ACSDlg owns
+  the **dialogue** strings. They don't overlap.
+- For CJK, use a TextMeshPro font with a dynamic atlas covering the glyphs.
+
 ## Architecture & format
 
 See `CLAUDE.md` (project map) and `docs/` (`.acsdlg` format spec and class architecture),

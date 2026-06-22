@@ -19,40 +19,44 @@
         <target>To keep things simple: a `:` had to be placed at the start of every line</target>
       </trans-unit>
       <trans-unit id="9517e9c9db3dd025">
-        <source>Le deux-points initial [p:0.5] délimite qui parle</source>
-        <target>The leading colon [p:0.5] marks who is speaking</target>
+        <source>Le deux-points initial <ph id="1">[p:0.5]</ph> délimite qui parle</source>
+        <target>The leading colon <ph id="1">[p:0.5]</ph> marks who is speaking</target>
       </trans-unit>
       <trans-unit id="db371ba90e1058f7">
-        <source>Ce que ça veut dire ?[p:1.5] C'est que je peux mettre autant de ::::::: que je veux :! après mon texte</source>
-        <target>What does that mean?[p:1.5] It means I can put as many ::::::: as I want :! after my text</target>
+        <source>Ce que ça veut dire ?<ph id="1">[p:1.5]</ph> C'est que je peux mettre autant de ::::::: que je veux :! après mon texte</source>
+        <target>What does that mean?<ph id="1">[p:1.5]</ph> It means I can put as many ::::::: as I want :! after my text</target>
       </trans-unit>
       <trans-unit id="2138c67817c1dcfc">
         <source>Et ce choix ne casse pas le language de programmation de dialogue que j'ai créer!</source>
         <target>And this choice doesn't break the dialogue scripting language I created!</target>
       </trans-unit>
       <trans-unit id="01f1a12b66b033a3">
-        <source>Comme vous l'aurez compris, ce système ce veut[tp] simple</source>
-        <target>As you'll have gathered, this system aims to be[tp] simple</target>
+        <source>Comme vous l'aurez compris, ce système ce veut<ph id="1">[tp]</ph> simple</source>
+        <target>As you'll have gathered, this system aims to be<ph id="1">[tp]</ph> simple</target>
       </trans-unit>
       <trans-unit id="5b4bb0d5b4921fbe">
-        <source>Les balises permettent[speed:0.3] de ralentir la vitesse de lecture[speed:1.0] ou de l'accélérer !</source>
-        <target>Tags let you[speed:0.3] slow the reading speed down[speed:1.0] or speed it up!</target>
+        <source>Les balises permettent<ph id="1">[speed:0.3]</ph> de ralentir la vitesse de lecture<ph id="2">[speed:1.0]</ph> ou de l'accélérer !</source>
+        <target>Tags let you<ph id="1">[speed:0.3]</ph> slow the reading speed down<ph id="2">[speed:1.0]</ph> or speed it up!</target>
       </trans-unit>
       <trans-unit id="e96819612e80bee9">
-        <source>Si je veux je peux aussi [tp]rendre l'affichage du dialogue instantanée !</source>
-        <target>If I want, I can also [tp]make the dialogue appear instantly!</target>
+        <source>Si je veux je peux aussi <ph id="1">[tp]</ph>rendre l'affichage du dialogue instantanée !</source>
+        <target>If I want, I can also <ph id="1">[tp]</ph>make the dialogue appear instantly!</target>
       </trans-unit>
       <trans-unit id="2240cd32699e4830">
-        <source>Une chose à savoir c'est que les balises permettent aussi d'envoyer des évènements ![emit:event]</source>
-        <target>One thing to know is that tags can also send events![emit:event]</target>
+        <source>Une chose à savoir c'est que les balises permettent aussi d'envoyer des évènements !<ph id="1">[emit:event]</ph></source>
+        <target>One thing to know is that tags can also send events!<ph id="1">[emit:event]</ph></target>
       </trans-unit>
       <trans-unit id="379d3006000a92f5">
         <source>Les évènements sont envoyés sous formes de messages strings, mais là je ne parle qu'au développeurs</source>
         <target>Events are sent as string messages, but here I'm only talking to developers</target>
       </trans-unit>
       <trans-unit id="edace38f35e17e31">
-        <source>[emit:Shake][speed: 0.3]Cependant[pause: 1.0]</source>
-        <target>[emit:Shake][speed: 0.3]However[pause: 1.0]</target>
+        <source>
+          <ph id="1">[emit:Shake]</ph>
+          <ph id="2">[speed: 0.3]</ph>Cependant<ph id="3">[pause: 1.0]</ph></source>
+        <target>
+          <ph id="1">[emit:Shake]</ph>
+          <ph id="2">[speed: 0.3]</ph>However<ph id="3">[pause: 1.0]</ph></target>
       </trans-unit>
       <trans-unit id="9ee37a4c04b9c982">
         <source>Maintenant les choix !</source>
