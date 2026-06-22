@@ -33,9 +33,9 @@ namespace ACSDlg.ConsoleApp
             Done,
         }
 
-        public ConsoleDialoguePresenter()
+        public ConsoleDialoguePresenter(DialogueLocalizer? pLocalizer = null)
         {
-            _runner = new DialogueRunner(this);
+            _runner = new DialogueRunner(this, pLocalizer);
         }
 
         /// <summary>Public entry point: plays the graph to completion on the calling thread.</summary>
